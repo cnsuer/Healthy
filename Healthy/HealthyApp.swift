@@ -9,9 +9,12 @@ import SwiftUI
 
 @main
 struct HealthyApp: App {
+    @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+
     var body: some Scene {
-        WindowGroup {
-            ContentView()
+        // 不需要主窗口，应用运行在状态栏
+        Settings {
+            EmptyView()
         }
     }
 }
