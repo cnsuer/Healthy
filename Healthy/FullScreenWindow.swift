@@ -21,12 +21,17 @@ class FullScreenWindow: NSPanel {
         self.hidesOnDeactivate = false
 
         if let screen = NSScreen.main {
-            self.setFrame(screen.frame, display: false)
+            self.setFrame(screen.frame, display: true)
         }
 
         let hostingController = NSHostingController(rootView: contentView)
         self.hostingController = hostingController
         self.contentViewController = hostingController
+
+        // 确保内容视图填充整个窗口
+        if let screen = NSScreen.main {
+            hostingController.view.setFrameSize(screen.frame.size)
+        }
     }
 
     override func close() {

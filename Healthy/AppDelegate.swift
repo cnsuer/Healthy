@@ -3,33 +3,49 @@ import SwiftUI
 import Combine
 
 class AppDelegate: NSObject, NSApplicationDelegate {
-    var statusItem: NSStatusItem?
-    var viewModel: EyeCareViewModel?
-    var popover: NSPopover?
-    var fullScreenWindow: FullScreenWindow?
+    // MARK: - Properties
+    private var viewModel: EyeCareViewModel?
+    private var statusBarManager: StatusBarManager?
+    private var popover: NSPopover?
+    private var fullScreenWindow: FullScreenWindow?
+    private var cancellables = Set<AnyCancellable>()
+
+    // MARK: - Application Lifecycle
 
     func applicationDidFinishLaunching(_ notification: Notification) {
-        // 创建ViewModel
+        // 创建 ViewModel
         let viewModel = EyeCareViewModel()
         self.viewModel = viewModel
 
-        // 创建状态栏项目
-        statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
-
-        if let statusButton = statusItem?.button {
-            statusButton.image = NSImage(systemSymbolName: "eye.circle.fill", accessibilityDescription: "Eye Care")
-            statusButton.image?.isTemplate = true
-            statusButton.action = #selector(statusBarButtonClicked)
-            statusButton.target = self
+        // 设置状态栏管理器
+        let statusBarManager = StatusBarManager()
+        self.statusBarManager = statusBarManager
+        statusBarManager.setup { [weak self] in
+            self?.statusBarButtonClicked()
         }
 
         // 创建弹出菜单
+        setupPopover()
+
+        // 设置 Combine 订阅
+        setupSubscriptions()
+    }
+
+    // MARK: - Setup Methods
+
+    private func setupPopover() {
+        guard let viewModel = viewModel else { return }
+
         popover = NSPopover()
         popover?.contentSize = NSSize(width: 300, height: 500)
         popover?.behavior = .transient
         popover?.contentViewController = NSHostingController(
             rootView: EyeCareMenuView(viewModel: viewModel)
         )
+    }
+
+    private func setupSubscriptions() {
+        guard let viewModel = viewModel else { return }
 
         // 监听全屏显示变化
         viewModel.$showFullScreen
@@ -60,10 +76,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             .store(in: &cancellables)
     }
 
-    private var cancellables = Set<AnyCancellable>()
+    // MARK: - UI Actions
 
-    @objc func statusBarButtonClicked() {
-        guard let statusButton = statusItem?.button else { return }
+    @objc private func statusBarButtonClicked() {
+        guard let statusBarManager = statusBarManager,
+              let statusButton = statusBarManager.statusItem?.button else {
+            return
+        }
 
         if let popover = popover, popover.isShown {
             popover.performClose(nil)
@@ -71,6 +90,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             popover?.show(relativeTo: statusButton.bounds, of: statusButton, preferredEdge: .minY)
         }
     }
+
+    // MARK: - Full Screen Management
 
     private func showFullScreen() {
         // 关闭弹出菜单
@@ -102,9 +123,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         window.safeClose()
     }
 
+    // MARK: - Status Bar Updates
+
     private func updateStatusBarIcon() {
-        guard let statusButton = statusItem?.button,
-              let viewModel = viewModel else { return }
+        guard let viewModel = viewModel,
+              let statusBarManager = statusBarManager else {
+            return
+        }
 
         if viewModel.settings.isEnabled {
             let remaining = Int(viewModel.remainingTime)
@@ -112,14 +137,16 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             let seconds = remaining % 60
 
             if remaining > 0 {
-                statusButton.title = String(format: "%02d:%02d", minutes, seconds)
+                statusBarManager.updateIcon(minutes: minutes, seconds: seconds)
             } else {
-                statusButton.title = ""
+                statusBarManager.clearIcon()
             }
         } else {
-            statusButton.title = ""
+            statusBarManager.clearIcon()
         }
     }
+
+    // MARK: - Application Termination
 
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
         // 不在关闭最后一个窗口时退出应用

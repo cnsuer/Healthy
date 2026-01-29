@@ -3,18 +3,21 @@ import SwiftUI
 import Combine
 
 class EyeCareViewModel: ObservableObject {
+    // MARK: - Published Properties
     @Published var settings: EyeCareSettings
     @Published var remainingTime: TimeInterval = 0
     @Published var showFullScreen: Bool = false
     @Published var currentInterval: EyeCareInterval?
     @Published var fullScreenRemainingTime: TimeInterval = 60
 
-    private var timer: Timer?
-    private var fullScreenTimer: Timer?
+    // MARK: - Private Properties
+    private var timerCancellable: AnyCancellable?
+    private var fullScreenTimerCancellable: AnyCancellable?
     private let userDefaults = UserDefaults.standard
     private let selectedIntervalKey = "selectedInterval"
     private let isEnabledKey = "isEnabled"
 
+    // MARK: - Initialization
     init(settings: EyeCareSettings = EyeCareSettings()) {
         self.settings = settings
         loadSettings()
@@ -74,20 +77,23 @@ class EyeCareViewModel: ObservableObject {
         remainingTime = interval
         currentInterval = settings.selectedInterval
 
-        timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
-            guard let self = self else { return }
-            self.remainingTime -= 1
+        // 使用 Combine 的 Timer.Publisher
+        timerCancellable = Timer.publish(every: 1.0, on: .main, in: .common)
+            .autoconnect()
+            .sink { [weak self] _ in
+                guard let self = self else { return }
+                self.remainingTime -= 1
 
-            if self.remainingTime <= 0 {
-                self.stopTimer()
-                self.showFullScreenAlert()
+                if self.remainingTime <= 0 {
+                    self.timerCancellable?.cancel()
+                    self.showFullScreenAlert()
+                }
             }
-        }
     }
 
     private func stopTimer() {
-        timer?.invalidate()
-        timer = nil
+        timerCancellable?.cancel()
+        timerCancellable = nil
     }
 
     private func showFullScreenAlert() {
@@ -97,27 +103,26 @@ class EyeCareViewModel: ObservableObject {
     }
 
     private func startFullScreenTimer() {
-        // 全屏提示自动退出计时器
-        fullScreenTimer = Timer.scheduledTimer(
-            withTimeInterval: 1.0,
-            repeats: true
-        ) { [weak self] _ in
-            guard let self = self else { return }
-            if self.fullScreenRemainingTime > 0 {
-                self.fullScreenRemainingTime -= 1
-            } else {
-                self.dismissFullScreen()
+        // 使用 Combine 的 Timer.Publisher
+        fullScreenTimerCancellable = Timer.publish(every: 1.0, on: .main, in: .common)
+            .autoconnect()
+            .sink { [weak self] _ in
+                guard let self = self else { return }
+                if self.fullScreenRemainingTime > 0 {
+                    self.fullScreenRemainingTime -= 1
+                } else {
+                    self.dismissFullScreen()
+                }
             }
-        }
     }
 
     private func stopFullScreenTimer() {
-        fullScreenTimer?.invalidate()
-        fullScreenTimer = nil
+        fullScreenTimerCancellable?.cancel()
+        fullScreenTimerCancellable = nil
     }
 
     private func updateRemainingTime() {
-        if settings.isEnabled && timer != nil {
+        if settings.isEnabled && timerCancellable != nil {
             // 计时器正在运行
         } else if settings.isEnabled {
             // 已启用但计时器未启动
@@ -149,26 +154,27 @@ class EyeCareViewModel: ObservableObject {
         }
     }
 
-    deinit {
-        stopTimer()
-        stopFullScreenTimer()
+    // MARK: - Public Computed Properties
+
+    /// 格式化的剩余时间字符串 (MM:SS)
+    var formattedRemainingTime: String {
+        return TimeFormatter.format(time: remainingTime)
     }
 
-    // MARK: - Formatting
-
-    func formattedRemainingTime() -> String {
-        let minutes = Int(remainingTime) / 60
-        let seconds = Int(remainingTime) % 60
-        return String(format: "%02d:%02d", minutes, seconds)
-    }
-
-    func statusMessage() -> String {
+    /// 状态消息
+    var statusMessage: String {
         if !settings.isEnabled {
             return "护眼提醒已关闭"
         } else if remainingTime > 0 {
-            return "距离休息还有: \(formattedRemainingTime())"
+            return "距离休息还有: \(formattedRemainingTime)"
         } else {
             return "准备启动..."
         }
+    }
+
+    // MARK: - Deinitialization
+    deinit {
+        stopTimer()
+        stopFullScreenTimer()
     }
 }

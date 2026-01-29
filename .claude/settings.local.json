@@ -5,7 +5,8 @@
       "Bash(open:*)",
       "Bash(killall:*)",
       "Bash(log show:*)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(find:*)"
     ]
   }
 }

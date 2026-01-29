@@ -11,7 +11,7 @@ struct EyeCareMenuView: View {
                     .font(.headline)
                     .padding(.bottom, 4)
 
-                Text(viewModel.statusMessage())
+                Text(viewModel.statusMessage)
                     .font(.system(.body, design: .monospaced))
                     .foregroundColor(.secondary)
 

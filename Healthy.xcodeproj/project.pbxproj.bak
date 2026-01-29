@@ -7,9 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		4D7530912F26A1000090D342 /* TimeFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D75308F2F26A1000090D342 /* TimeFormatter.swift */; };
-		4D7530922F26A1000090D342 /* StatusBarManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D7530902F26A1000090D342 /* StatusBarManager.swift */; };
-
 		4D7530752F2648730090D342 /* HealthyApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D7530742F2648730090D342 /* HealthyApp.swift */; };
 		4D7530792F2648750090D342 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4D7530782F2648750090D342 /* Assets.xcassets */; };
 		4D75307C2F2648750090D342 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4D75307B2F2648750090D342 /* Preview Assets.xcassets */; };
@@ -22,9 +19,6 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		4D75308F2F26A1000090D342 /* TimeFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeFormatter.swift; sourceTree = "<group>"; };
-		4D7530902F26A1000090D342 /* StatusBarManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusBarManager.swift; sourceTree = "<group>"; };
-
 		4D7530712F2648730090D342 /* Healthy.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Healthy.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4D7530742F2648730090D342 /* HealthyApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthyApp.swift; sourceTree = "<group>"; };
 		4D7530782F2648750090D342 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -75,8 +69,6 @@
 				4D7530882F2649BA0090D342 /* EyeCareViewModel.swift */,
 				4D75308A2F2649C00090D342 /* EyeCareMenuView.swift */,
 				4D75308C2F2649C50090D342 /* FullScreenReminderView.swift */,
-				4D75308F2F26A1000090D342 /* TimeFormatter.swift */,
-				4D7530902F26A1000090D342 /* StatusBarManager.swift */,
 				4D7530782F2648750090D342 /* Assets.xcassets */,
 				4D75307D2F2648750090D342 /* Healthy.entitlements */,
 				4D75307A2F2648750090D342 /* Preview Content */,
@@ -164,9 +156,7 @@
 			files = (
 				4D7530752F2648730090D342 /* HealthyApp.swift in Sources */,
 				4D7530832F2649B00090D342 /* AppDelegate.swift in Sources */,
-				4D7530912F26A1000090D342 /* TimeFormatter.swift in Sources */,
-					4D7530922F26A1000090D342 /* StatusBarManager.swift in Sources */,
-					4D75308D2F26A0000090D342 /* FullScreenWindow.swift in Sources */,
+				4D75308D2F26A0000090D342 /* FullScreenWindow.swift in Sources */,
 				4D7530852F2649B50090D342 /* EyeCareSettings.swift in Sources */,
 				4D7530872F2649BA0090D342 /* EyeCareViewModel.swift in Sources */,
 				4D7530892F2649C00090D342 /* EyeCareMenuView.swift in Sources */,

@@ -90,8 +90,8 @@ struct FullScreenReminderView: View {
                 .buttonStyle(PlainButtonStyle())
                 .padding(.bottom, 60)
             }
+            .frame(minWidth: 800, minHeight: 600)
         }
-        .frame(minWidth: 1920, minHeight: 1080)
     }
 }
 
